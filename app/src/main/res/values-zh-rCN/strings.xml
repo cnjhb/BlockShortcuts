@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">屏蔽键盘快捷键</string>
+    <string name="app_name_subtitle">Vector / LSPosed 系统框架模块</string>
+    <string name="xposed_description">屏蔽实体键盘触发的系统级快捷键（音量、电源、导航、媒体、功能键、Win 键、系统组合键等）</string>
+
+    <string name="intro">在 Vector / LSPosed 中启用模块，并把作用域勾选为「系统框架」后生效。</string>
+    <string name="status_title">模块状态</string>
+    <string name="status_offline">未检测到模块在 system_server 中运行。请确认已启用模块并勾选「系统框架」作用域。</string>
+    <string name="status_online">已注入 system_server（%1$d 秒前同步）\n生效配置：%2$s</string>
+    <string name="status_stale">上次同步在 %1$d 分钟前，模块可能已停止运行。</string>
+
+    <string name="sw_enabled">启用屏蔽</string>
+    <string name="sw_hardware_only">仅拦截实体键盘</string>
+    <string name="caption_hardware_only">软键盘输入与模拟按键不受影响。</string>
+
+    <string name="groups_title">屏蔽哪些快捷键</string>
+    <string name="sw_nav">导航键：主页 / 返回 / 菜单 / 最近任务</string>
+    <string name="sw_meta">Win（Meta）键及其组合</string>
+    <string name="sw_volume">音量键：加 / 减 / 静音</string>
+    <string name="sw_power">电源 / 休眠 / 唤醒</string>
+    <string name="sw_media">媒体键：播放 / 上下曲 / 快进快退</string>
+    <string name="sw_function">功能键：F1–F12、Esc、PrtSc 等</string>
+    <string name="sw_combo">系统组合：Ctrl+Alt+Del、Alt+Tab 等</string>
+
+    <string name="custom_title">补充屏蔽键码</string>
+    <string name="custom_keys_hint">要屏蔽的键码，例如 24, 82</string>
+    <string name="allow_title">白名单键码</string>
+    <string name="allow_keys_hint">永不屏蔽的键码，例如 111</string>
+    <string name="keys_hint">填 Android KeyEvent 键码数字，用逗号分隔。白名单优先级最高。</string>
+
+    <string name="sw_queue_short">入队阶段拦截</string>
+    <string name="caption_queue">让应用层也收不到按键。副作用：息屏时无法用键盘唤醒、锁屏相关按键失效。应用自己实现的组合键（如浏览器 Ctrl+W）也需要靠它来禁用。</string>
+    <string name="sw_debug">记录拦截日志（logcat -s BlockShortcuts）</string>
+    <string name="apply">应用并同步到系统框架</string>
+    <string name="applied">已应用</string>
+    <string name="log_hint">修改开关后会自动同步，无需手动点击按钮。</string>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Block Keyboard Shortcuts</string>
+    <string name="app_name_subtitle">Vector / LSPosed system framework module</string>
+    <string name="xposed_description">Blocks system-level shortcuts triggered by a physical keyboard (volume, power, navigation, media, function keys, Win key, system combos, etc.)</string>
+
+    <string name="intro">Enable the module in Vector / LSPosed and tick the \"System Framework\" scope for it to take effect.</string>
+    <string name="status_title">Module status</string>
+    <string name="status_offline">Module is not running inside system_server. Make sure the module is enabled and the \"System Framework\" scope is ticked.</string>
+    <string name="status_online">Injected into system_server (synced %1$d s ago)\nActive config: %2$s</string>
+    <string name="status_stale">Last sync was %1$d min ago — the module may have stopped running.</string>
+
+    <string name="sw_enabled">Blocking enabled</string>
+    <string name="sw_hardware_only">Physical keyboard only</string>
+    <string name="caption_hardware_only">Soft-keyboard input and injected events are never affected.</string>
+
+    <string name="groups_title">Shortcut groups</string>
+    <string name="sw_nav">Navigation: Home / Back / Menu / Recents</string>
+    <string name="sw_meta">Win (Meta) key and its combos</string>
+    <string name="sw_volume">Volume: up / down / mute</string>
+    <string name="sw_power">Power / Sleep / Wake</string>
+    <string name="sw_media">Media: play / next / previous / seek</string>
+    <string name="sw_function">Function keys: F1–F12, Esc, PrtSc, etc.</string>
+    <string name="sw_combo">System combos: Ctrl+Alt+Del, Alt+Tab, etc.</string>
+
+    <string name="custom_title">Extra keycodes</string>
+    <string name="custom_keys_hint">Keycodes to block, e.g. 24, 82</string>
+    <string name="allow_title">Allowlist keycodes</string>
+    <string name="allow_keys_hint">Keycodes never blocked, e.g. 111</string>
+    <string name="keys_hint">Use Android KeyEvent keycode numbers separated by commas. The allowlist always wins.</string>
+
+    <string name="sw_queue_short">Block before queueing</string>
+    <string name="caption_queue">Apps stop receiving the key entirely. Side effects: a keyboard can no longer wake the device from sleep, and lock-screen keys stop working. Required to disable app-level combos such as Ctrl+W in a browser.</string>
+    <string name="sw_debug">Log blocked keys (logcat -s BlockShortcuts)</string>
+    <string name="apply">Apply and sync to system framework</string>
+    <string name="applied">Applied</string>
+    <string name="log_hint">Toggles are synced automatically — no need to tap the button.</string>
+</resources>
