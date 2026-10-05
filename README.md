@@ -44,11 +44,18 @@
 ```bash
 git clone <this-repo>
 cd BlockShortcuts
+
+# 调试包：11 MB 左右，未混淆，便于断点与查看日志
 ./gradlew :app:assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
+
+# 发布包：R8 混淆 + 资源压缩，约 1.5 MB，建议日常使用这个
+./gradlew :app:assembleRelease
+# 产物：app/build/outputs/apk/release/app-release.apk
 ```
 
 构建环境：JDK 17、Gradle 9.3.1（wrapper）、AGP 9.1.0、compileSdk 36.1、Material 1.10.0。
+依赖只有 `androidx.core:core`、`androidx.appcompat`、`com.google.android.material`（代码全为 Java，不引入 Kotlin 运行时）。
 
 ### 2. 安装 APK
 
@@ -205,6 +212,28 @@ app/src/main/
 - `res/values/strings.xml` 为**默认英文**，`res/values-zh-rCN/strings.xml` 为简体中文。
 - `res/xml/locales_config.xml` 声明支持的语言（`en`、`zh-CN`），因此系统「应用语言」里可以单独切换本模块语言。
 - 新增语言：复制 `values/strings.xml` 为 `values-xx/strings.xml` 并翻译，同时在 `locales_config.xml` 中登记。
+
+### APK 体积
+
+| 构建 | 体积 | 说明 |
+| --- | --- | --- |
+| `assembleDebug` | ≈ 11 MB | 未混淆，`classes.dex` 约 9.5 MB |
+| `assembleRelease` | ≈ 1.5 MB | R8 混淆 + `isShrinkResources`，dex 约 740 KB |
+
+体积主要来自 `com.google.android.material:material`：它带有 Kotlin 写的实现，debug 包会把这些代码原样打进 dex。想更小可以裁掉用不到的 Material 组件，或改用 `androidx.appcompat` + 手写样式。
+
+### 发布签名
+
+`release` 构建默认回退到 `~/.android/debug.keystore`，便于本地直接出包；要正式签名请在 `local.properties`（已被 gitignore）中配置：
+
+```properties
+RELEASE_STORE_FILE=/path/to/your.jks
+RELEASE_KEY_ALIAS=your-alias
+RELEASE_STORE_PASSWORD=***
+RELEASE_KEY_PASSWORD=***
+```
+
+也支持环境变量 `BS_STORE_FILE` / `BS_KEY_ALIAS` / `BS_STORE_PASSWORD` / `BS_KEY_PASSWORD`。
 
 ### 依赖来源
 
