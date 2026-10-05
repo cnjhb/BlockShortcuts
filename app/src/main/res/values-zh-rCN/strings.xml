@@ -35,4 +35,21 @@
     <string name="apply">应用并同步到系统框架</string>
     <string name="applied">已应用</string>
     <string name="log_hint">修改开关后会自动同步，无需手动点击按钮。</string>
+    <string name="about_entry">关于本模块</string>
+    <string name="about_version_unknown">未知</string>
+    <string name="about_version_line">%1$s · %2$s</string>
+    <string name="about_build_debug">debug 构建</string>
+    <string name="about_build_release">release 构建</string>
+    <string name="about_system_line">Android %1$s（API %2$d）</string>
+    <string name="about_label_system">系统环境</string>
+    <string name="about_label_framework">框架要求</string>
+    <string name="about_label_channel">配置通道</string>
+    <string name="about_label_status">模块状态</string>
+    <string name="about_value_framework">JingMatrix Vector / LSPosed，需勾选「系统框架」作用域</string>
+    <string name="about_value_channel">广播 + ContentProvider + Settings.Global 心跳</string>
+    <string name="about_status_online">已在 system_server 中运行</string>
+    <string name="about_status_offline">未运行</string>
+    <string name="about_repo">在 GitHub 查看源码</string>
+    <string name="about_no_browser">没有可打开链接的应用</string>
+    <string name="close">关闭</string>
 </resources>

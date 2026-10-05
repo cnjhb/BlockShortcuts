@@ -1,6 +1,13 @@
 package asia.cnjhb.blockshortcuts.ui;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import asia.cnjhb.blockshortcuts.R;
 import asia.cnjhb.blockshortcuts.common.Config;
@@ -29,6 +37,8 @@ import asia.cnjhb.blockshortcuts.hook.ConfigBridge;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String REPO_URL = "https://github.com/cnjhb/BlockShortcuts";
 
     private SwitchCompat swEnabled;
     private SwitchCompat swHardwareOnly;
@@ -79,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         cardStatus = findViewById(R.id.card_status);
         statusDot = findViewById(R.id.v_status_dot);
         MaterialButton btnApply = findViewById(R.id.btn_apply);
+        MaterialButton btnAbout = findViewById(R.id.btn_about);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
@@ -107,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         swQueue.setOnClickListener(listener);
         swDebug.setOnClickListener(listener);
         btnApply.setOnClickListener(v -> apply(true));
+        btnAbout.setOnClickListener(v -> showAbout());
 
         // 打开界面即把已保存配置推给 system_server，避免用户以为要点按钮才生效
         ConfigSender.send(this, Config.load(this));
@@ -178,11 +190,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateStatus() {
-        String heartbeat = null;
-        try {
-            heartbeat = Settings.Global.getString(getContentResolver(), ConfigBridge.SETTINGS_KEY);
-        } catch (Throwable ignored) {
-        }
+        String heartbeat = readHeartbeat();
         if (TextUtils.isEmpty(heartbeat)) {
             paintStatus(R.color.status_bad);
             tvStatus.setText(R.string.status_offline);
@@ -210,6 +218,57 @@ public class MainActivity extends AppCompatActivity {
         int color = ContextCompat.getColor(this, colorRes);
         cardStatus.setStrokeColor(color);
         ViewCompat.setBackgroundTintList(statusDot, ColorStateList.valueOf(color));
+    }
+
+    private void showAbout() {
+        View content = getLayoutInflater().inflate(R.layout.dialog_about, null);
+
+        String version = getString(R.string.about_version_unknown);
+        String build = "";
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = info.versionName + " (" + info.getLongVersionCode() + ")";
+            boolean debuggable = (info.applicationInfo.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+            build = getString(debuggable ? R.string.about_build_debug : R.string.about_build_release);
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
+        ((TextView) content.findViewById(R.id.tv_about_version))
+                .setText(getString(R.string.about_version_line, version, build));
+        ((TextView) content.findViewById(R.id.tv_about_system))
+                .setText(getString(R.string.about_system_line,
+                        Build.VERSION.RELEASE, Build.VERSION.SDK_INT));
+
+        TextView aboutStatus = content.findViewById(R.id.tv_about_status);
+        if (TextUtils.isEmpty(readHeartbeat())) {
+            aboutStatus.setText(R.string.about_status_offline);
+            aboutStatus.setTextColor(ContextCompat.getColor(this, R.color.status_bad));
+        } else {
+            aboutStatus.setText(R.string.about_status_online);
+            aboutStatus.setTextColor(ContextCompat.getColor(this, R.color.status_ok));
+        }
+
+        content.findViewById(R.id.btn_repo).setOnClickListener(v -> openRepo());
+
+        new MaterialAlertDialogBuilder(this)
+                .setView(content, 24, 12, 24, 0)
+                .setPositiveButton(R.string.close, null)
+                .show();
+    }
+
+    private void openRepo() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(REPO_URL)));
+        } catch (ActivityNotFoundException ignored) {
+            Toast.makeText(this, R.string.about_no_browser, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String readHeartbeat() {
+        try {
+            return Settings.Global.getString(getContentResolver(), ConfigBridge.SETTINGS_KEY);
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     private static String joinKeys(List<Integer> keys) {

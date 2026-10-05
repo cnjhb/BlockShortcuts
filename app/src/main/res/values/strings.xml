@@ -35,4 +35,21 @@
     <string name="apply">Apply and sync to system framework</string>
     <string name="applied">Applied</string>
     <string name="log_hint">Toggles are synced automatically — no need to tap the button.</string>
+    <string name="about_entry">About this module</string>
+    <string name="about_version_unknown">unknown</string>
+    <string name="about_version_line">%1$s · %2$s</string>
+    <string name="about_build_debug">debug build</string>
+    <string name="about_build_release">release build</string>
+    <string name="about_system_line">Android %1$s (API %2$d)</string>
+    <string name="about_label_system">System</string>
+    <string name="about_label_framework">Framework</string>
+    <string name="about_label_channel">Config channel</string>
+    <string name="about_label_status">Module status</string>
+    <string name="about_value_framework">JingMatrix Vector / LSPosed — tick the \"System Framework\" scope</string>
+    <string name="about_value_channel">Broadcast + ContentProvider + Settings.Global heartbeat</string>
+    <string name="about_status_online">Running inside system_server</string>
+    <string name="about_status_offline">Not running</string>
+    <string name="about_repo">View source on GitHub</string>
+    <string name="about_no_browser">No app available to open the link</string>
+    <string name="close">Close</string>
 </resources>

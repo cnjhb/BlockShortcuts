@@ -481,6 +481,17 @@
                 android:gravity="center"
                 android:text="@string/intro"
                 android:textAppearance="@style/TextAppearance.BlockShortcuts.Caption" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_about"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="6dp"
+                android:text="@string/about_entry"
+                app:icon="@drawable/ic_info"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>
