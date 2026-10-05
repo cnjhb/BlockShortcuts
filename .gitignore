@@ -12,5 +12,10 @@ local.properties
 *.iml
 *.hprof
 
+# 签名密钥（禁止入库）
+*.jks
+*.keystore
+key.jks
+
 # OS
 .DS_Store

@@ -18,7 +18,7 @@ android {
         minSdk = 33
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,13 +31,18 @@ android {
             if (local.exists()) {
                 local.inputStream().use { props.load(it) }
             }
-            val store = props.getProperty("RELEASE_STORE_FILE") ?: System.getenv("BS_STORE_FILE")
-            val alias = props.getProperty("RELEASE_KEY_ALIAS") ?: System.getenv("BS_KEY_ALIAS")
+            // 同时接受 AGP 社区惯例属性名（storeFile/keyAlias/...）与本项目的 RELEASE_* 写法
+            val store = props.getProperty("RELEASE_STORE_FILE") ?: props.getProperty("storeFile")
+                ?: System.getenv("BS_STORE_FILE")
+            val alias = props.getProperty("RELEASE_KEY_ALIAS") ?: props.getProperty("keyAlias")
+                ?: System.getenv("BS_KEY_ALIAS")
             if (store != null && alias != null) {
                 storeFile = file(store)
-                storePassword = props.getProperty("RELEASE_STORE_PASSWORD") ?: System.getenv("BS_STORE_PASSWORD")
+                storePassword = props.getProperty("RELEASE_STORE_PASSWORD") ?: props.getProperty("storePassword")
+                    ?: System.getenv("BS_STORE_PASSWORD")
                 keyAlias = alias
-                keyPassword = props.getProperty("RELEASE_KEY_PASSWORD") ?: System.getenv("BS_KEY_PASSWORD")
+                keyPassword = props.getProperty("RELEASE_KEY_PASSWORD") ?: props.getProperty("keyPassword")
+                    ?: System.getenv("BS_KEY_PASSWORD")
             } else {
                 val debugKeystore = File(System.getProperty("user.home"), ".android/debug.keystore")
                 storeFile = debugKeystore

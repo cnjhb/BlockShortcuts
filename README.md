@@ -233,7 +233,38 @@ RELEASE_STORE_PASSWORD=***
 RELEASE_KEY_PASSWORD=***
 ```
 
-也支持环境变量 `BS_STORE_FILE` / `BS_KEY_ALIAS` / `BS_STORE_PASSWORD` / `BS_KEY_PASSWORD`。
+也支持环境变量 `BS_STORE_FILE` / `BS_KEY_ALIAS` / `BS_STORE_PASSWORD` / `BS_KEY_PASSWORD`，以及 AGP 社区惯例写法 `storeFile` / `keyAlias` / `storePassword` / `keyPassword`（CI 里常用）。
+
+首次发布前先生成一套正式密钥并永久保管——之后所有版本必须用同一把签名，否则用户无法覆盖升级：
+
+```bash
+keytool -genkeypair -v -keystore blockshortcuts.jks -alias blockshortcuts \
+        -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 blockshortcuts.jks > blockshortcuts.jks.b64   # 贴进 CI 密钥
+```
+
+### 提交到 LSPosed 模块仓库
+
+模块列表（<https://modules.lsposed.org>）的数据来自 `Xposed-Modules-Repo` 组织下的仓库，更新包则从**仓库的 GitHub Release 资产**下载。本仓库已按该格式准备：
+
+| 文件 / 机制 | 作用 |
+| --- | --- |
+| `SUMMARY` | 根目录单行描述，模块列表展示用 |
+| `SOURCE_URL` | 指向本源码仓库 |
+| `README.md` / `LICENSE` | 说明与许可证（GPL-3.0） |
+| `.github/workflows/android.yml` | 构建签名 release APK 并上传为 Release 资产 |
+| Release tag 命名 | `<提交 issue 号>-<版本号>`，如 `1289-1.7.0`，LSPosed 依赖这个格式识别版本 |
+
+一次完整发布的流程：
+
+1. 在 <https://github.com/Xposed-Modules-Repo/submission> 新建 issue，填写包名 `asia.cnjhb.blockshortcuts` 与说明。
+2. 在本仓库添加仓库 Secrets：
+   - `SIGNING_KEY`：`blockshortcuts.jks.b64` 的内容
+   - `KEY_STORE_PASSWORD` / `ALIAS` / `KEY_PASSWORD`
+3. 添加仓库变量 `LSPOSED_ISSUE_NUMBER`（上一步拿到的 issue 号），或手动触发 workflow 时在 `issue_number` 输入框填写。
+4. 改 `versionName` → 推送，CI 自动构建并发布 `BlockShortcuts_<版本>.apk` 到 tag `<issue号>-<版本号>` 的 Release。
+
+包名归属验证：官方快速通道是在 App ID 对应域名的根域添加 TXT 记录 `lsposed-modules-repo-verification=<GitHub 用户名>`。若没有自有域名，只能在 issue 中说明并等待维护者人工审核。
 
 ### 依赖来源
 
@@ -246,6 +277,10 @@ compileOnly(libs.xposed.api)
 ```
 
 ---
+
+## 许可证
+
+[GPL-3.0](LICENSE) — 你可以自由使用、修改与再分发，但衍生作品必须同样以 GPL-3.0 发布并保留版权声明。
 
 ## 已知限制
 

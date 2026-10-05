@@ -1,0 +1,96 @@
+name: Android CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Xposed-Modules-Repo/submission 的 issue 号（用于生成 LSPosed 模块仓库要求的 tag）'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: 准备签名密钥
+        if: github.event_name != 'pull_request'
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::notice::未配置 SIGNING_KEY，release 包会回退到 debug 密钥（仅供试装，切勿分发）"
+            exit 0
+          fi
+          printf '%s' "$SIGNING_KEY" | base64 --decode > key.jks
+          {
+            echo "storeFile=key.jks"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storePassword=$KEY_STORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "RELEASE_STORE_FILE=key.jks"
+            echo "RELEASE_KEY_ALIAS=$KEY_ALIAS"
+            echo "RELEASE_STORE_PASSWORD=$KEY_STORE_PASSWORD"
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> local.properties
+
+      - name: 缓存 Gradle 并构建
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --console=plain
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/app-release.apk
+
+      - name: 发布 GitHub Release（供 LSPosed 模块仓库分发）
+        if: github.event_name != 'pull_request'
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          ISSUE_INPUT: ${{ inputs.issue_number }}
+          ISSUE_VAR: ${{ vars.LSPOSED_ISSUE_NUMBER }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::notice::没有正式签名密钥，跳过 release 发布"
+            exit 0
+          fi
+          ISSUE="${ISSUE_INPUT:-$ISSUE_VAR}"
+          if [ -z "$ISSUE" ]; then
+            echo "::notice::未设置仓库变量 LSPOSED_ISSUE_NUMBER，跳过 release 发布（LSPosed 模块仓库要求 tag 为 <issue号>-<版本号>）"
+            exit 0
+          fi
+          VERSION=$(sed -n 's/.*versionName = "\(.*\)".*/\1/p' app/build.gradle.kts | head -1)
+          TAG="$ISSUE-$VERSION"
+          APK="BlockShortcuts_$VERSION.apk"
+          cp app/build/outputs/apk/release/app-release.apk "$APK"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" \
+              --title "$TAG" \
+              --notes "BlockShortcuts $VERSION — LSPosed 模块仓库分发包"
+          fi
+          echo "已发布 $TAG"
